@@ -32,6 +32,31 @@
             
         </div>
     </div>
+    <div id="addSubjectModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Add New Subject</h2>
+            <div class="input-group">
+                <label for="newSubjectName">Subject Name:</label>
+                <input type="text" id="newSubjectName" placeholder="Enter subject name">
+            </div>
+            <div class="input-group">
+                <button id="addSubjectBtn">Add Subject</button>
+            </div>
+        </div>
+    </div>
+    <div id="deleteSubjectModal" class="modal">
+        <div class="modal-content">
+            <span class="close-delete-btn">&times;</span>
+            <h2>Delete Subject</h2>
+            <p>Are you sure you want to delete the subject <span id="deleteSubjectName"></span>?</p>
+            <div class="input-group">
+                <button id="confirmDeleteBtn">Delete</button>
+                <button id="cancelDeleteBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
     <script src="js.js">
         
     </script>

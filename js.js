@@ -15,9 +15,6 @@ function delayedSave(subjectName=null) {
 }
 
 function addNewSubject(subjectName = null) {
-    if (!subjectName) {
-        subjectName = prompt('Enter subject name:');
-    }
     if (subjectName) {
         
         subjects[subjectName] = {};
@@ -35,9 +32,7 @@ function createTab(subjectName) {
     tab.onclick = () => showTab(subjectName);
     tab.oncontextmenu = (e) => {
         e.preventDefault();
-        if (confirm(`Delete the tab and all its data for ${subjectName}?`)) {
-            deleteSubject(subjectName, tab);
-        }
+        openDeleteModal(subjectName, deleteSubject, subjectName, tab);
     };
     document.getElementById('tabs').insertBefore(tab, document.getElementById('tabs').lastChild);
 }
@@ -348,4 +343,89 @@ function loadFromLocalStorage() {
 
         calculateNeededGrades(subjectName);
     });
+}
+
+// JavaScript for modal functionality
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('addSubjectModal');
+    const closeBtn = document.querySelector('.close-btn');
+    const addSubjectBtn = document.getElementById('addSubjectBtn');
+    const newSubjectNameInput = document.getElementById('newSubjectName');
+    
+    // Function to open the modal
+    function openModal() {
+        modal.style.display = 'block';
+        newSubjectNameInput.value = ''; // Clear the input field
+    }
+    
+    // Function to close the modal
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+    
+    // When the user clicks on the button, open the modal
+    document.querySelector('.add-subject-btn').addEventListener('click', openModal);
+    
+    // When the user clicks on <span> (x), close the modal
+    closeBtn.addEventListener('click', closeModal);
+    
+    // When the user clicks anywhere outside of the modal, close it
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+    
+    // When the user clicks the add button in the modal
+    addSubjectBtn.addEventListener('click', () => {
+        const subjectName = newSubjectNameInput.value.trim();
+        if (subjectName) {
+            addNewSubject(subjectName);
+            closeModal();
+        } else {
+            alert('Please enter a subject name.');
+        }
+    });
+
+    // now for delete section
+    const closeDeleteBtn = document.querySelector('.close-delete-btn');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+    // Close delete modal
+    closeDeleteBtn.addEventListener('click', closeDeleteModal);
+    cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+
+    // Confirm delete action
+    confirmDeleteBtn.addEventListener('click', () => {
+        if (deleteFunc) {
+            deleteFunc(...deleteArgs);
+        }
+        closeDeleteModal();
+    });
+});
+
+
+let deleteFunc = null;
+let deleteArgs = [];
+
+// Function to open the delete modal
+function openDeleteModal(subjectName, func, ...args) {
+    const deleteModal = document.getElementById('deleteSubjectModal');
+    const deleteSubjectNameSpan = document.getElementById('deleteSubjectName');
+
+    deleteModal.style.display = 'block';
+    deleteSubjectNameSpan.textContent = subjectName;
+
+    // Store the function and arguments
+    deleteFunc = func;
+    deleteArgs = args;
+}
+
+// Function to close the delete modal
+function closeDeleteModal() {
+    const deleteModal = document.getElementById('deleteSubjectModal');
+    deleteModal.style.display = 'none';
+    deleteFunc = null;
+    deleteArgs = [];
 }
