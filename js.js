@@ -24,7 +24,7 @@ function addNewSubject(subjectName = null) {
         createTab(subjectName);
         createSubjectContent(subjectName);
         saveToLocalStorage();
-        updateSummary();
+        showTab(subjectName);
     }
 }
 
@@ -100,10 +100,11 @@ function deleteSubject(subjectName, tab) {
     }
     
     saveToLocalStorage();
-    showTab('summary');
+    showTab('Summary');
 }
 
 function showTab(id) {
+    console.log("Attemping to show the tab for: " + id);
     // Hide all tab contents and remove the active class from all tabs
     document.querySelectorAll('.tab-content').forEach(tabContent => tabContent.classList.add('hidden'));
     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -123,7 +124,7 @@ function showTab(id) {
     });
 
     // Update the summary if the summary tab is selected
-    if (id === 'summary') {
+    if (id === 'Summary') {
         updateSummary();
     }
 }
@@ -202,6 +203,9 @@ function getColorForGrade(currentGrade, goalGrade, neededGrade) {
     return `rgb(${red},${green},0)`;
 }
 
+
+let summaryChartInstance = null;
+
 function updateSummary() {
     const summaryData = Object.keys(subjects).map(subjectName => {
         const subjectData = subjects[subjectName];
@@ -252,7 +256,11 @@ function updateSummary() {
         }
     });
 
-    // Generate chart
+    // Check if a chart instance already exists and destroy it
+    if (summaryChartInstance) {
+        summaryChartInstance.destroy();
+    }
+
     const ctx = document.getElementById('summaryChart').getContext('2d');
     const chartData = {
         labels: summaryData.map(data => data.subject),
@@ -274,10 +282,12 @@ function updateSummary() {
         ]
     };
 
-    new Chart(ctx, {
+    summaryChartInstance = new Chart(ctx, {
         type: 'bar',
         data: chartData,
         options: {
+            maintainAspectRatio: true,
+            responsive: true,
             scales: {
                 y: {
                     beginAtZero: true
@@ -289,7 +299,7 @@ function updateSummary() {
 
 window.onload = () => {
     loadFromLocalStorage();
-    showTab('summary');
+    showTab('Summary');
 };
 
 function saveToLocalStorage() {
