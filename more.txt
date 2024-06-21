@@ -1,0 +1,3 @@
+This is excellent work. can you modify this code so that the custom rule area is default empty and user must click "create custom rule" by which then a sentence with three inputs will be appear and user must select from the drop down what it is.
+
+"Must achieve {textbox should be for a percentage} on assessment item {drop down of all the above entered assessment items for this subject} to get {input for percentage.}"

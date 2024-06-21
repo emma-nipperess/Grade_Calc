@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        .container { width: 80%; margin: auto; padding: 20px; background: #fff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; }
+        .input-group input { width: 100%; padding: 8px; box-sizing: border-box; }
+        .input-group button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .input-group button:hover { background-color: #0056b3; }
+        .tabs { display: flex; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background-color: #ddd; margin-right: 5px; border-radius: 5px; cursor: pointer; }
+        .tab.active { background-color: #007bff; color: white; }
+        .hidden { display: none; }
+        .assessment-item { display: flex; margin-bottom: 10px; }
+        .assessment-item input { width: 30%; margin-right: 5%; }
+        .assessment-item button { padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .assessment-item button:hover { background-color: #c82333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tabs" id="tabs">
+            <div class="tab active" onclick="showTab('summary')">Summary</div>
+            <div class="tab" onclick="addNewSubject()">Add Subject</div>
+        </div>
+        <div id="summary" class="tab-content">
+            <h2>Summary</h2>
+            <div id="summaryContent"></div>
+        </div>
+    </div>
+    <script src="js.js">
+        
+    </script>
+</body>
+</html>
