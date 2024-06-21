@@ -103,19 +103,21 @@ function deleteSubject(subjectName, tab) {
     showTab('summary');
 }
 
-
 function showTab(id) {
     // Hide all tab contents and remove the active class from all tabs
     document.querySelectorAll('.tab-content').forEach(tabContent => tabContent.classList.add('hidden'));
     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
 
-    // Show the selected tab content
-    document.getElementById(id).classList.remove('hidden');
+    // Show the selected tab content with a transition
+    setTimeout(() => {
+        document.getElementById(id).classList.remove('hidden');
+        document.getElementById(id).classList.add('fade-in');
+    }, 10);
 
-    // Find the tab element corresponding to the selected tab content and add the active class
+    // Add the active class to the selected tab
     const tabs = document.querySelectorAll('.tab');
     tabs.forEach(tab => {
-        if (tab.getAttribute('data-tab-id') === id) {
+        if (tab.innerText === id) {
             tab.classList.add('active');
         }
     });
@@ -125,6 +127,7 @@ function showTab(id) {
         updateSummary();
     }
 }
+
 
 function calculateNeededGrades(subjectName) {
     console.log(subjectName);
@@ -245,6 +248,40 @@ function updateSummary() {
             if (!isNaN(currentGrade) && !isNaN(goalGrade) && !isNaN(neededGrade)) {
                 const color = getColorForGrade(currentGrade, goalGrade, neededGrade);
                 row.getElement().style.backgroundColor = color;
+            }
+        }
+    });
+
+    // Generate chart
+    const ctx = document.getElementById('summaryChart').getContext('2d');
+    const chartData = {
+        labels: summaryData.map(data => data.subject),
+        datasets: [
+            {
+                label: 'Current Grade',
+                data: summaryData.map(data => parseFloat(data.currentGrade)),
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Goal Grade',
+                data: summaryData.map(data => parseFloat(data.goalGrade)),
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }
+        ]
+    };
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: chartData,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             }
         }
     });
