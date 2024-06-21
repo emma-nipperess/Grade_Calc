@@ -3,8 +3,8 @@ body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-colo
 .container:hover { background-color: #fcfcfc; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); }
 .input-group input { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; transition: border-color 0.3s ease; }
 .input-group input:focus { border-color: #007bff; }
-.input-group button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease; }
-.input-group button:hover { background-color: #0056b3; }
+button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease; }
+button:hover { background-color: #0056b3; }
 .tab { padding: 10px 20px; background-color: #ddd; margin-right: 5px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease, color 0.3s ease; }
 .tab:hover { background-color: #ccc; }
 .tab.active { background-color: #007bff; color: white; }
@@ -39,6 +39,23 @@ body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-colo
 .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
 .close-btn:hover, .close-btn:focus { color: black; text-decoration: none; cursor: pointer; }
 
+#cookedRating {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#cookedRating h3 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+#cookedScore {
+    font-size: 24px;
+    font-weight: bold;
+    color: #d9534f;
+}
+
 
 .tabs::-webkit-scrollbar {
     height: 6px;
@@ -52,5 +69,16 @@ body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-colo
 .tabs::-webkit-scrollbar-thumb {
     background-color: #888; /* Grey thumb */
     border-radius: 10px;
+}
+
+.toggle-cooked-btn {
+    display: block;
+    margin: 0 auto 20px;
+    padding: 10px 20px;
+   
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
 

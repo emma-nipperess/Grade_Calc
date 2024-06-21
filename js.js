@@ -173,7 +173,6 @@ function calculateNeededGrade(goalGrade, currentGrade, totalWeight) {
     return neededGrade > 0 ? neededGrade : 0;
 }
 
-
 function getColorForGrade(currentGrade, goalGrade, neededGrade) {
     if (neededGrade === 'N/A' || neededGrade > 100) {
         // If the needed grade is above 100% or not applicable, mark as red
@@ -188,20 +187,36 @@ function getColorForGrade(currentGrade, goalGrade, neededGrade) {
         return `rgb(0, 255, 0)`;
     }
 
-    // Otherwise, calculate a gradient between red and green based on how close the current grade is to the goal
-    let percentage = Math.min(Math.max((currentGrade / goalGrade) * 100, 0), 100);
+    // Calculate the percentage of the goal achieved
+    let percentage = ranking(neededGrade, currentGrade) * 100;
+    console.log("current grade: " + currentGrade + "goalGrade: " + goalGrade);
 
-    // Calculate red and green values
-    let red = Math.min(255, 255 * ((100 - percentage) / 100));
-    let green = Math.min(255, 255 * (percentage / 100));
+    // Calculate the RGB values for the gradient
+    let red, green;
+    if (percentage < 90) {
+        // Transition from red to yellow
+        red = 255;
+        green = Math.round(10 * percentage);
+        console.log("colour for red to yellow is green: " + green + "with percentage: " + percentage)
+    } else {
+        // Transition from yellow to green
+        green = 255;
+        red = Math.round(510 - 5.1 * percentage);
+        console.log("colour for yellow to green is red: " + red + "with percentage: " + percentage)
+    }
 
     return `rgb(${red},${green},0)`;
 }
 
 
+function ranking(neededGrade, currentGrade) {
+    return (Math.max(0, ((neededGrade - currentGrade)) / currentGrade));
+}
+
 let summaryChartInstance = null;
 
 function updateSummary() {
+    const summaryContent = document.getElementById('summaryContent');
     const emptyState = document.getElementById('emptyState');
 
     if (Object.keys(subjects).length === 0) {
@@ -245,16 +260,14 @@ function updateSummary() {
             { title: "Subject", field: "subject", sorter: "string" },
             { title: "Goal Grade", field: "goalGrade", sorter: "number" },
             { title: "Current Grade", field: "currentGrade", sorter: "number" },
-            { title: "Need to get", field: "neededGrade", sorter: "number" }
+            { title: "Required Grade on Future Assessments", field: "neededGrade", sorter: "number" }
         ],
         rowFormatter: function(row) {
-            // Retrieve row data
             const data = row.getData();
             const currentGrade = parseFloat(data.currentGrade);
             const goalGrade = parseFloat(data.goalGrade);
             const neededGrade = parseFloat(data.neededGrade);
 
-            // Apply background color based on the current grade and needed grade
             if (!isNaN(currentGrade) && !isNaN(goalGrade) && !isNaN(neededGrade)) {
                 const color = getColorForGrade(currentGrade, goalGrade, neededGrade);
                 row.getElement().style.backgroundColor = color;
@@ -327,8 +340,6 @@ function saveToLocalStorage() {
     localStorage.setItem('subjects', JSON.stringify(subjects));
 }
 
-
-
 function loadFromLocalStorage() {
     const storedSubjects = JSON.parse(localStorage.getItem('subjects')) || {};
     subjects = storedSubjects;
@@ -358,6 +369,22 @@ function loadFromLocalStorage() {
 
 // JavaScript for modal functionality
 document.addEventListener('DOMContentLoaded', () => {
+    /* COOKING */
+    const toggleCookedButton = document.getElementById('toggleCookedButton');
+    toggleCookedButton.addEventListener('click', () => {
+        const cookedRating = document.getElementById('cookedRating');
+        if (cookedRating.style.display === 'none' || cookedRating.style.display === '') {
+            updateCookedSection();
+            cookedRating.style.display = 'block';
+            cookedRating.scrollIntoView({ behavior: 'smooth' });
+            toggleCookedButton.textContent = 'Hide Cookedness, Please.';
+        } else {
+            cookedRating.style.display = 'none';
+            toggleCookedButton.textContent = 'See How Cooked I Am';
+        }
+    });
+    /* END COOKING */
+
     const modal = document.getElementById('addSubjectModal');
     const closeBtn = document.querySelector('.close-btn');
     const addSubjectBtn = document.getElementById('addSubjectBtn');
@@ -447,4 +474,81 @@ function closeDeleteModal() {
     deleteModal.style.display = 'none';
     deleteFunc = null;
     deleteArgs = [];
+}
+
+function getCookedColor(score) {
+    const red = Math.min(255, 255 * (score / 100));
+    const green = Math.min(255, 255 * ((100 - score) / 100));
+    return `rgb(${red},${green},0)`;
+}
+
+function calculateCookedScore(summaryData) {
+    let totalCooked = 0;
+    let totalSubjects = summaryData.length;
+
+    summaryData.forEach(data => {
+        const currentGrade = parseFloat(data.currentGrade);
+        const goalGrade = parseFloat(data.goalGrade);
+        const neededGrade = parseFloat(data.neededGrade);
+
+        if (!isNaN(currentGrade) && !isNaN(goalGrade) && !isNaN(neededGrade)) {
+            if (neededGrade > 100) {
+                totalCooked += 1; // Fully cooked if needed grade is above 100%
+            } else {
+                // Partially cooked based on how close neededGrade is to 100%
+                totalCooked += ranking(neededGrade, currentGrade) * 5;
+                console.log(totalCooked);
+            }
+        }
+    });
+
+    // Calculate the cooked score as a percentage
+    let cookedScore = (totalCooked / totalSubjects) * 100;
+
+    // Cap the score at 100
+    cookedScore = Math.min(cookedScore, 100);
+
+    return cookedScore.toFixed(2);
+}
+
+
+function updateCookedSection() {
+    const cookedScoreDiv = document.getElementById('cookedScore');
+    const memeDiv = document.getElementById('memeDiv');
+    
+    const summaryData = Object.keys(subjects).map(subjectName => {
+        const subjectData = subjects[subjectName];
+        const goalGrade = parseFloat(document.getElementById(`goalGrade_${subjectName}`)?.value) || 0;
+        let currentGrade = 0;
+        let totalWeight = 0;
+
+        Array.from(document.querySelectorAll(`#${subjectName} .assessment-item`)).forEach(item => {
+            const weight = parseFloat(item.children[0]?.value) || 0;
+            const grade = parseFloat(item.children[1]?.value);
+            if (!isNaN(grade)) {
+                currentGrade += (grade * weight) / 100;
+                totalWeight += weight;
+            }
+        });
+
+        const neededGrade = calculateNeededGrade(goalGrade, currentGrade, totalWeight);
+
+        return {
+            subject: subjectName,
+            goalGrade: goalGrade || 'N/A',
+            currentGrade: totalWeight ? (currentGrade / totalWeight * 100).toFixed(2) : 'N/A',
+            neededGrade: neededGrade
+        };
+    });
+
+    const cookedScore = calculateCookedScore(summaryData);
+    cookedScoreDiv.textContent = `${cookedScore}% COOKED`;
+    cookedScoreDiv.style.color = getCookedColor(cookedScore);
+
+    // Show or hide the meme based on the cooked score
+    if (cookedScore > 80) {
+        memeDiv.style.display = 'block';
+    } else {
+        memeDiv.style.display = 'none';
+    }
 }
