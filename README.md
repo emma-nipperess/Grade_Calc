@@ -7,8 +7,10 @@ I have this code written in excel but I to format it the precise way I wanted, I
 
 ![drag](media/drag.gif)
 
-I also have drawn lot's of inspiration from my favourite streamer. I won't reveal who, but I leave behind a clue - read the about. 
+I also have drawn inspiration from a streamer who shall not be named. You may figure it out. 
 
 ## How to use
 
-Well, the page is currently not live. However, when it is I will update this with the URL
+Page is currently live: https://emma-nipperess.github.io/Grade_Calc/
+
+Because I don't want to pay for a server or database or be responsible for potentially leaking my own data (#humble cause I know only I will use this), the site uses the browser's local storage. So you may return to this page with the data saved provided you return via the same device and browser profile. 
