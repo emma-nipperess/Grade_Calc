@@ -163,24 +163,52 @@ function calculateNeededGrades(subjectId) {
     document.getElementById(`results_${subjectId}`).innerText = `To achieve a ${goalGrade}% overall, you need to score at least ${neededGrade}% on the remaining assessments.`;
 }
 
-function updateSummary() {
-    const summaryContent = document.getElementById('summaryContent');
-    summaryContent.innerHTML = subjects.map((subject, index) => {
-        const subjectId = `subject_${index}`;
-        const goalGrade = document.getElementById(`goalGrade_${subjectId}`)?.value || 'N/A';
 
-        return `
-            <h3>${subject}</h3>
-            <p>Goal Grade: ${goalGrade}%</p>
-            <p>Assessment Items:</p>
-            ${Array.from(document.querySelectorAll(`#${subjectId} .assessment-item`)).map((item, i) => {
-                const weight = item.children[0]?.value || 'N/A';
-                const grade = item.children[1]?.value || 'N/A';
-                return `<p>Item ${i + 1}: Weight - ${weight}%, Achieved - ${grade}%</p>`;
-            }).join('')}
-        `;
-    }).join('');
+function calculateNeededGrade(goalGrade, currentGrade, totalWeight) {
+    const remainingWeight = 100 - totalWeight;
+    if (remainingWeight <= 0) return 'N/A';
+    const neededGrade = ((goalGrade - currentGrade) / (remainingWeight / 100)).toFixed(2);
+    return neededGrade > 0 ? neededGrade : 0;
 }
+
+function updateSummary() {
+    const summaryData = subjects.map((subject, index) => {
+        const subjectId = `subject_${index}`;
+        const goalGrade = parseFloat(document.getElementById(`goalGrade_${subjectId}`)?.value) || 0;
+        let currentGrade = 0;
+        let totalWeight = 0;
+
+        Array.from(document.querySelectorAll(`#${subjectId} .assessment-item`)).forEach(item => {
+            const weight = parseFloat(item.children[0]?.value) || 0;
+            const grade = parseFloat(item.children[1]?.value);
+            if (!isNaN(grade)) {
+                currentGrade += (grade * weight) / 100;
+                totalWeight += weight;
+            }
+        });
+
+        const neededGrade = calculateNeededGrade(goalGrade, currentGrade, totalWeight);
+
+        return {
+            subject: subject,
+            goalGrade: goalGrade || 'N/A',
+            currentGrade: totalWeight ? (currentGrade / totalWeight * 100).toFixed(2) : 'N/A',
+            neededGrade: neededGrade
+        };
+    });
+
+    new Tabulator("#summaryTable", {
+        data: summaryData,
+        layout: "fitColumns",
+        columns: [
+            { title: "Subject", field: "subject", sorter: "string" },
+            { title: "Goal Grade", field: "goalGrade", sorter: "number" },
+            { title: "Current Grade", field: "currentGrade", sorter: "number" },
+            { title: "Required Grade on Future Assessments", field: "neededGrade", sorter: "number" }
+        ]
+    });
+}
+
 
 window.onload = () => {
     loadFromLocalStorage();
