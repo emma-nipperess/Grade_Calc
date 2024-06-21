@@ -49,8 +49,8 @@ function createSubjectContent(subjectName) {
     content.innerHTML = `
         <h2>${subjectName}</h2>
         <div class="input-group">
-            <label for="goalGrade_${subjectName}">Goal Grade (%)</label>
-            <input type="number" id="goalGrade_${subjectName}" placeholder="Enter your goal grade" oninput="delayedSave()">
+            <label for="goalGrade_${subjectName}"  >Goal Grade (%)</label>
+            <input type="number" id="goalGrade_${subjectName}" placeholder="Enter your goal grade" oninput="delayedSave(subjectName='${subjectName}')">
         </div>
         <div id="assessments_${subjectName}">
             <h3>Assessments</h3>
@@ -174,6 +174,31 @@ function calculateNeededGrade(goalGrade, currentGrade, totalWeight) {
     return neededGrade > 0 ? neededGrade : 0;
 }
 
+
+function getColorForGrade(currentGrade, goalGrade, neededGrade) {
+    if (neededGrade === 'N/A' || neededGrade > 100) {
+        // If the needed grade is above 100% or not applicable, mark as red
+        return `rgb(255, 0, 0)`;
+    }
+
+    // Calculate the difference between current grade and goal grade
+    const gradeDifference = currentGrade - goalGrade;
+
+    // If the current grade is well above the goal, mark as green
+    if (gradeDifference >= 10) { // You can adjust the threshold for "well above"
+        return `rgb(0, 255, 0)`;
+    }
+
+    // Otherwise, calculate a gradient between red and green based on how close the current grade is to the goal
+    let percentage = Math.min(Math.max((currentGrade / goalGrade) * 100, 0), 100);
+
+    // Calculate red and green values
+    let red = Math.min(255, 255 * ((100 - percentage) / 100));
+    let green = Math.min(255, 255 * (percentage / 100));
+
+    return `rgb(${red},${green},0)`;
+}
+
 function updateSummary() {
     const summaryData = Object.keys(subjects).map(subjectName => {
         const subjectData = subjects[subjectName];
@@ -208,7 +233,20 @@ function updateSummary() {
             { title: "Goal Grade", field: "goalGrade", sorter: "number" },
             { title: "Current Grade", field: "currentGrade", sorter: "number" },
             { title: "Required Grade on Future Assessments", field: "neededGrade", sorter: "number" }
-        ]
+        ],
+        rowFormatter: function(row) {
+            // Retrieve row data
+            const data = row.getData();
+            const currentGrade = parseFloat(data.currentGrade);
+            const goalGrade = parseFloat(data.goalGrade);
+            const neededGrade = parseFloat(data.neededGrade);
+
+            // Apply background color based on the current grade and needed grade
+            if (!isNaN(currentGrade) && !isNaN(goalGrade) && !isNaN(neededGrade)) {
+                const color = getColorForGrade(currentGrade, goalGrade, neededGrade);
+                row.getElement().style.backgroundColor = color;
+            }
+        }
     });
 }
 
