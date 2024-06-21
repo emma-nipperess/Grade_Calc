@@ -183,7 +183,7 @@ function getColorForGrade(currentGrade, goalGrade, neededGrade) {
     const gradeDifference = currentGrade - goalGrade;
 
     // If the current grade is well above the goal, mark as green
-    if (gradeDifference >= 10) { // You can adjust the threshold for "well above"
+    if (gradeDifference >= 0) { //  threshold for "well above"
         return `rgb(0, 255, 0)`;
     }
 
@@ -216,8 +216,10 @@ function ranking(neededGrade, currentGrade) {
 let summaryChartInstance = null;
 
 function updateSummary() {
+    hideCookedness();
     const summaryContent = document.getElementById('summaryContent');
     const emptyState = document.getElementById('emptyState');
+
 
     if (Object.keys(subjects).length === 0) {
         summaryContent.style.display = 'none';
@@ -367,6 +369,11 @@ function loadFromLocalStorage() {
     });
 }
 
+function hideCookedness() {
+    cookedRating.style.display = 'none';
+    toggleCookedButton.textContent = 'See How Cooked I Am';
+}
+
 // JavaScript for modal functionality
 document.addEventListener('DOMContentLoaded', () => {
     /* COOKING */
@@ -379,8 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cookedRating.scrollIntoView({ behavior: 'smooth' });
             toggleCookedButton.textContent = 'Hide Cookedness, Please.';
         } else {
-            cookedRating.style.display = 'none';
-            toggleCookedButton.textContent = 'See How Cooked I Am';
+            hideCookedness();
         }
     });
     /* END COOKING */
@@ -496,7 +502,7 @@ function calculateCookedScore(summaryData) {
                 totalCooked += 1; // Fully cooked if needed grade is above 100%
             } else {
                 // Partially cooked based on how close neededGrade is to 100%
-                totalCooked += ranking(neededGrade, currentGrade) * 5;
+                totalCooked += ranking(neededGrade, currentGrade);
                 console.log(totalCooked);
             }
         }
