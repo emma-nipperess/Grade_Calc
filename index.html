@@ -23,11 +23,28 @@
         
         <div id="Summary" class="tab-content">
             <h2>Summary</h2>
+            <div id="emptyState" style="display: none; text-align: center; padding: 20px;">
+                <i class="fas fa-info-circle" style="font-size: 48px; color: #007bff; margin-bottom: 10px;"></i>
+                <p style="font-size: 18px; font-weight: bold; color: #333;">No subjects added yet.</p>
+                <p style="font-size: 16px; color: #555;">
+                    I suggest you add them so that you can use a calc. If you just joined, 'calc' is short for calculator. I'm just using slang.
+                </p>
+                <p style="font-size: 16px; color: #555;">
+                    Whenever you start using bigger numbers, that's when you have to pull out a calc. I'm not gonna deny that there are literal geniuses that can do math that quick, but you're not one of them. So use the calc.
+                </p>
+                <p style="font-size: 16px; color: #555;">
+                    Again, for those of you just joined - 'calc' is short for calculator. I am just using slang.
+                </p>
+            </div>
             <div id="summaryContent">
                 <div id="summaryTable"></div>
                 <div id="summaryChartContainer">
                     <canvas id="summaryChart"></canvas>
-                </div>                
+                </div>  
+                
+                <p style="font-size: 16px; color: #555;">
+                    You literally just used a calc. If you just joined chat, 'calc' is short for calculator. I'm just using slang.
+                </p>
             </div>
             
         </div>
@@ -47,11 +64,11 @@
     </div>
     <div id="deleteSubjectModal" class="modal">
         <div class="modal-content">
-            <span class="close-delete-btn">&times;</span>
+            <span class="close-btn" id="close-delete-btn">&times;</span>
             <h2>Delete Subject</h2>
             <p>Are you sure you want to delete the subject <span id="deleteSubjectName"></span>?</p>
             <div class="input-group">
-                <button id="confirmDeleteBtn">Delete</button>
+                <button id="confirmDeleteBtn" onclick="">Delete</button>
                 <button id="cancelDeleteBtn">Cancel</button>
             </div>
         </div>

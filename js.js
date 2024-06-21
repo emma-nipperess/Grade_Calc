@@ -202,6 +202,17 @@ function getColorForGrade(currentGrade, goalGrade, neededGrade) {
 let summaryChartInstance = null;
 
 function updateSummary() {
+    const emptyState = document.getElementById('emptyState');
+
+    if (Object.keys(subjects).length === 0) {
+        summaryContent.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+    } else {
+        summaryContent.style.display = 'block';
+        emptyState.style.display = 'none';
+    }
+
     const summaryData = Object.keys(subjects).map(subjectName => {
         const subjectData = subjects[subjectName];
         const goalGrade = parseFloat(document.getElementById(`goalGrade_${subjectName}`)?.value) || 0;
@@ -387,8 +398,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Allow ENTER key to submit the form
+    newSubjectNameInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            addSubjectBtn.click();
+        }
+    });
+
     // now for delete section
-    const closeDeleteBtn = document.querySelector('.close-delete-btn');
+    const closeDeleteBtn = document.querySelector('#close-delete-btn');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 
