@@ -239,7 +239,7 @@ function updateSummary() {
             { title: "Subject", field: "subject", sorter: "string" },
             { title: "Goal Grade", field: "goalGrade", sorter: "number" },
             { title: "Current Grade", field: "currentGrade", sorter: "number" },
-            { title: "Required Grade on Future Assessments", field: "neededGrade", sorter: "number" }
+            { title: "Need to get", field: "neededGrade", sorter: "number" }
         ],
         rowFormatter: function(row) {
             // Retrieve row data
