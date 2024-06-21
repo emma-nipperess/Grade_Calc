@@ -3,7 +3,7 @@
 
 ## Inspiration
 
-I have this code written in excel but I to format it the precise way I wanted, I had to start writing the code in VBA which is such a drag.
+I have this code written in excel but to format it the precise way I wanted, I had to start writing the code in VBA which is such a drag.
 
 ![drag](media/drag.gif)
 
