@@ -520,7 +520,6 @@ function calculateCookedScore(summaryData) {
 
 function updateCookedSection() {
     const cookedScoreDiv = document.getElementById('cookedScore');
-    const memeDiv = document.getElementById('memeDiv');
     
     const summaryData = Object.keys(subjects).map(subjectName => {
         const subjectData = subjects[subjectName];
@@ -552,9 +551,17 @@ function updateCookedSection() {
     cookedScoreDiv.style.color = getCookedColor(cookedScore);
 
     // Show or hide the meme based on the cooked score
+    const memeDiv = document.getElementById('memeDiv');
+    const imgFile = memeDiv.querySelector('img');
+
     if (cookedScore > 80) {
         memeDiv.style.display = 'block';
+        imgFile.src = "media/max_cooked.jpg";
+    } else if (cookedScore < 30) {
+        memeDiv.style.display = 'block';
+        imgFile.src = "media/not_cooked.png";
     } else {
-        memeDiv.style.display = 'none';
+        memeDiv.style.display = 'block';
+        imgFile.src = "media/medium_cooked.gif";
     }
 }
