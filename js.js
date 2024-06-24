@@ -1,6 +1,8 @@
 let subjects = {};
 let saveTimeout;
 let calculationTimeout;
+let calcTimeout;
+let timer;
 
 function delayedSave(subjectName=null) {
     clearTimeout(saveTimeout);
@@ -59,18 +61,68 @@ function createSubjectContent(subjectName) {
     document.querySelector('.container').appendChild(content);
 }
 
+
+function handleInput(id, subjectName) {
+    const input = document.getElementById(id).value.trim();
+    
+    if (input.startsWith('=')) {
+        clearTimeout(timer);
+    } else {
+        clearTimeout(timer);
+        timer = setTimeout(() => calculateResult(id, subjectName), 1000);
+    }
+
+    
+}
+
+function calculateResult(id, subjectName) {
+    const input = document.getElementById(id);
+    const inputVal = input.value.trim();
+    
+    if (inputVal.startsWith('=')) {
+        // Evaluate expression
+        const expression = inputVal.slice(1); // Remove the leading '='
+        try {
+            const result = (eval(expression) * 100).toFixed(2);
+            input.innerText = result;
+            input.value = result;
+            console.log("expression " + result);
+        } catch (e) {
+            input.innerText = 'Invalid Expression';
+        }
+    } else {
+        // Treat input as a number
+        const number = parseFloat(input);
+        if (!isNaN(number)) {
+            input.innerText = result;
+            input.value =result;
+            console.log("pure number: " + result);
+        } else {
+            input.innerText = 'Invalid Input';
+        }
+    }
+    delayedSave(subjectName=subjectName);
+}
+
 function addAssessmentItem(subjectName) {
     const assessmentId = `assessment_${document.querySelectorAll(`#${subjectName} .assessment-item`).length}`;
     const assessmentDiv = document.createElement('div');
     assessmentDiv.className = 'assessment-item';
     console.log(subjectName);
+    const gradeId = `${subjectName}_${assessmentId}_grade`
     assessmentDiv.innerHTML = `
         <input type="number" id="${subjectName}_${assessmentId}_weight" placeholder="Weight (%)" oninput="delayedSave(subjectName='${subjectName}')">
-        <input type="number" id="${subjectName}_${assessmentId}_grade" placeholder="Achieved (%)" oninput="delayedSave(subjectName='${subjectName}')">
+        <input type="text" id="${gradeId}" placeholder="Achieved (%)" title="Enter a number or an expression starting with '=' for calculations." oninput="handleInput('${gradeId}', '${subjectName}')">
         <button onclick="deleteAssessmentItem('${subjectName}', '${assessmentId}')">Delete</button>
     `;
     console.log(assessmentDiv);
     document.getElementById(`assessments_${subjectName}`).appendChild(assessmentDiv);
+
+    document.getElementById(gradeId).addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            calculateResult(gradeId, subjectName);
+        }
+    });
 }
 
 function deleteAssessmentItem(subjectName, assessmentId) {
