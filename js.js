@@ -27,15 +27,31 @@ function addNewSubject(subjectName = null) {
     }
 }
 
+function handleLongPress(subjectName, tab) {
+    openDeleteModal(subjectName, deleteSubject, subjectName, tab);
+}
+
 function createTab(subjectName) {
     const tab = document.createElement('div');
     tab.className = 'tab';
-    tab.innerText = subjectName;
+    tab.innerHTML = `<i class="fas fa-book"></i> ${subjectName}`;
     tab.onclick = () => showTab(subjectName);
+
+    let pressTimer;
+    
+    tab.onmousedown = (e) => {
+        pressTimer = setTimeout(() => handleLongPress(subjectName, tab), 1000);
+    };
+    
+    tab.onmouseup = tab.onmouseleave = (e) => {
+        clearTimeout(pressTimer);
+    };
+
     tab.oncontextmenu = (e) => {
         e.preventDefault();
         openDeleteModal(subjectName, deleteSubject, subjectName, tab);
     };
+
     document.getElementById('tabs').insertBefore(tab, document.getElementById('tabs').lastChild);
 }
 
@@ -165,7 +181,7 @@ function showTab(id) {
     // Add the active class to the selected tab
     const tabs = document.querySelectorAll('.tab');
     tabs.forEach(tab => {
-        if (tab.innerText === id) {
+        if (tab.innerText.trim() === id) {
             tab.classList.add('active');
         }
     });

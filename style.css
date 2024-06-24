@@ -20,6 +20,7 @@ button:hover { background-color: #0056b3; }
 .tab { padding: 10px 20px; background-color: #ddd; margin-right: 5px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease, color 0.3s ease; }
 .tab:hover { background-color: #ccc; }
 .tab.active { background-color: #007bff; color: white; }
+.tab:active { background-color: #81beff; }
 .hidden { display: none; }
 .assessment-item { display: flex; margin-bottom: 10px; }
 #summaryTable { margin-bottom: 20px; }
