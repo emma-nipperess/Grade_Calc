@@ -193,56 +193,10 @@ function showTab(id) {
 }
 
 
-function calculateNeededGrades(subjectName) {
-    console.log(subjectName);
-    
-    console.log("ca");
-    const goalGrade = parseFloat(document.getElementById(`goalGrade_${subjectName}`).value);
-    const assessmentItems = document.querySelectorAll(`#${subjectName} .assessment-item`);
-    let totalWeight = 0;
-    let currentGrade = 0;
-    let unmarkedWeight = 0;
-
-    assessmentItems.forEach(item => {
-        const weight = parseFloat(item.children[0].value) || 0;
-        const grade = parseFloat(item.children[1].value);
-
-        if (isNaN(grade)) {
-            unmarkedWeight += weight;
-        } else {
-            totalWeight += weight;
-            currentGrade += (grade * weight) / 100;
-        }
-    });
-
-    const remainingWeight = 100 - totalWeight;
-
-    if (remainingWeight < 0) {
-        document.getElementById(`results_${subjectName}`).innerText = 'Total weight exceeds 100%. Please adjust the weights.';
-        return;
-    }
-
-    const neededGrade = ((goalGrade - currentGrade) / (remainingWeight / 100)).toFixed(2);
-
-    document.querySelectorAll(`#${subjectName} .assessment-item`).forEach(item => {
-        if (!item.children[1].value) {
-            item.children[1].placeholder = `Need ${neededGrade}%`;
-        }
-    });
-
-    document.getElementById(`results_${subjectName}`).innerText = `To achieve a ${goalGrade}% overall, you need to score at least ${neededGrade}% on the remaining assessments.`;
-}
-
-
-function calculateNeededGrade(goalGrade, currentGrade, totalWeight) {
-    const remainingWeight = 100 - totalWeight;
-    if (remainingWeight <= 0) return 'N/A';
-    const neededGrade = ((goalGrade - currentGrade) / (remainingWeight / 100)).toFixed(2);
-    return neededGrade > 0 ? neededGrade : 0;
-}
-
 function getColorForGrade(currentGrade, goalGrade, neededGrade) {
-    if (neededGrade === 'N/A' || neededGrade > 100) {
+    console.log("Gettnig colour for needed grade: " + neededGrade + "\n");
+    if (neededGrade == 'ERR' || neededGrade > 100) {
+        console.log("THIS IS SO TRUEE");
         // If the needed grade is above 100% or not applicable, mark as red
         return `rgb(255, 0, 0)`;
     }
@@ -278,16 +232,66 @@ function getColorForGrade(currentGrade, goalGrade, neededGrade) {
 
 
 function ranking(neededGrade, currentGrade) {
-    return (Math.max(0, ((neededGrade - currentGrade)) / currentGrade));
+    return (Math.max(0, ((neededGrade - currentGrade)) / currentGrade)) || 0;
 }
 
 let summaryChartInstance = null;
+
+function calculateNeededGrades(subjectName) {
+    console.log(subjectName);
+    
+    const goalGrade = parseFloat(document.getElementById(`goalGrade_${subjectName}`).value);
+    const assessmentItems = document.querySelectorAll(`#${subjectName} .assessment-item`);
+    let totalWeight = 0;
+    let currentGrade = 0;
+
+    assessmentItems.forEach(item => {
+        const weight = parseFloat(item.children[0].value) || 0;
+        const grade = parseFloat(item.children[1].value);
+
+        if (!isNaN(grade)) {
+            totalWeight += weight;
+            currentGrade += (grade * weight) / 100;
+        }
+    });
+
+    const remainingWeight = 100 - totalWeight;
+
+    if (totalWeight === 100) {
+        document.getElementById(`results_${subjectName}`).innerText = 'All assessments graded.';
+        assessmentItems.forEach(item => {
+            if (!item.children[1].value) {
+                item.children[1].placeholder = "ERR";
+            }
+        });
+        return;
+    } else if (remainingWeight < 0) {
+        document.getElementById(`results_${subjectName}`).innerText = 'Total weight exceeds 100%. Please adjust the weights.';
+        return;
+    }
+
+    const neededGrade = ((goalGrade - currentGrade) / (remainingWeight / 100)).toFixed(2);
+
+    assessmentItems.forEach(item => {
+        if (!item.children[1].value) {
+            item.children[1].placeholder = `Need ${neededGrade}%`;
+        }
+    });
+
+    document.getElementById(`results_${subjectName}`).innerText = `To achieve a ${goalGrade}% overall, you need to score at least ${neededGrade}% on the remaining assessments.`;
+}
+
+function calculateNeededGrade(goalGrade, currentGrade, totalWeight) {
+    const remainingWeight = 100 - totalWeight;
+    if (remainingWeight <= 0) return 'N/A';
+    const neededGrade = ((goalGrade - currentGrade) / (remainingWeight / 100)).toFixed(2);
+    return neededGrade > 0 ? neededGrade : 0;
+}
 
 function updateSummary() {
     hideCookedness();
     const summaryContent = document.getElementById('summaryContent');
     const emptyState = document.getElementById('emptyState');
-
 
     if (Object.keys(subjects).length === 0) {
         summaryContent.style.display = 'none';
@@ -299,7 +303,6 @@ function updateSummary() {
     }
 
     const summaryData = Object.keys(subjects).map(subjectName => {
-        const subjectData = subjects[subjectName];
         const goalGrade = parseFloat(document.getElementById(`goalGrade_${subjectName}`)?.value) || 0;
         let currentGrade = 0;
         let totalWeight = 0;
@@ -313,12 +316,12 @@ function updateSummary() {
             }
         });
 
-        const neededGrade = calculateNeededGrade(goalGrade, currentGrade, totalWeight);
+        const neededGrade = totalWeight === 100 ? 'N/A' : calculateNeededGrade(goalGrade, currentGrade, totalWeight);
 
         return {
             subject: subjectName,
-            goalGrade: goalGrade || 'N/A',
-            currentGrade: totalWeight ? (currentGrade / totalWeight * 100).toFixed(2) : 'N/A',
+            goalGrade: goalGrade || 'ERR',
+            currentGrade: totalWeight ? (currentGrade / totalWeight * 100).toFixed(2) : 'ERR',
             neededGrade: neededGrade
         };
     });
@@ -336,9 +339,10 @@ function updateSummary() {
             const data = row.getData();
             const currentGrade = parseFloat(data.currentGrade);
             const goalGrade = parseFloat(data.goalGrade);
-            const neededGrade = parseFloat(data.neededGrade);
+            const neededGrade = (data.neededGrade);
+            console.log("NEED: " + neededGrade);
 
-            if (!isNaN(currentGrade) && !isNaN(goalGrade) && !isNaN(neededGrade)) {
+            if (!isNaN(currentGrade) && !isNaN(goalGrade)) {
                 const color = getColorForGrade(currentGrade, goalGrade, neededGrade);
                 row.getElement().style.backgroundColor = color;
             }
@@ -608,8 +612,8 @@ function updateCookedSection() {
 
         return {
             subject: subjectName,
-            goalGrade: goalGrade || 'N/A',
-            currentGrade: totalWeight ? (currentGrade / totalWeight * 100).toFixed(2) : 'N/A',
+            goalGrade: goalGrade || 'ERR',
+            currentGrade: totalWeight ? (currentGrade / totalWeight * 100).toFixed(2) : 'ERR',
             neededGrade: neededGrade
         };
     });
